@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
@@ -18,23 +19,22 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 app.get("/", (_req, res) => {
   res.status(200).json({
-    status: "ok",
-    message: "API is running",
-    timestamp: new Date().toISOString(),
+    status:      "ok",
+    message:     "API is running",
+    timestamp:   new Date().toISOString(),
     environment: process.env.NODE_ENV || "development",
   });
 });
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
-// Example:
-// import userRoutes from "./routes/user.routes.js";
-// app.use("/api/v1/users", userRoutes);
+
+app.use("/api/auth", authRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 
 app.use((req, res) => {
   res.status(404).json({
-    status: "error",
+    status:  "error",
     message: `Route ${req.method} ${req.originalUrl} not found`,
   });
 });
@@ -43,7 +43,7 @@ app.use((req, res) => {
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
-  const status = err.status || err.statusCode || 500;
+  const status  = err.status || err.statusCode || 500;
   const message = err.message || "Internal Server Error";
 
   if (process.env.NODE_ENV !== "production") {
@@ -52,7 +52,7 @@ app.use((err, _req, res, _next) => {
   }
 
   res.status(status).json({
-    status: "error",
+    status:  "error",
     message,
     ...(process.env.NODE_ENV !== "production" && { stack: err.stack }),
   });
